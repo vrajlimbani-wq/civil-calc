@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>સિવિલ કન્સ્ટ્રક્શન કેલ્ક્યુલેટર & ડ્રોઈંગ પ્લાનર</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #172554;
+            --accent: #ea580c;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            color: #0f172a;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 13px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-print {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            float: right;
+        }
+
+        /* Canvas Drawing Container */
+        .drawing-container {
+            text-align: center;
+            background: #ffffff;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        canvas {
+            background: #fdfdfd;
+            border-radius: 4px;
+            max-width: 100%;
+        }
+
+        /* Tables & Results */
+        .table-res {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .table-res th, .table-res td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        .table-res th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .table-res tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .highlight-val {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .cost-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .cost-row.total {
+            font-size: 17px;
+            font-weight: bold;
+            color: #166534;
+            border-top: 1px solid #86efac;
+            padding-top: 6px;
+            margin-top: 6px;
+        }
+
+        @media print {
+            body { padding: 0; background: #fff; }
+            .card { box-shadow: none; border: 1px solid #ccc; }
+            .btn-calc, .btn-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🏗️ સિવિલ કન્સ્ટ્રક્શન કેલ્ક્યુલેટર & સ્ટ્રક્ચરલ પ્લાનર</h1>
+        <p>દિવાલ ચણતર, સ્લેબ કોંક્રિટ, સળિયા (Steel Rebar), બીમ-કોલમ ગણતરી અને 2D ડ્રોઈંગ</p>
+    </header>
+
+    <div class="grid-layout">
+        <!-- Input Panel -->
+        <div class="left-panel">
+            <div class="card">
+                <h2>🧱 ૧. ચણતર કામ (Brickwork Dimensions)</h2>
+                <div class="form-group three-col">
+                    <div>
+                        <label>દિવાલ લંબાઈ (L - ફૂટ)</label>
+                        <input type="number" id="wallLen" value="20" min="1" step="0.5">
+                    </div>
+                    <div>
+                        <label>ઊંચાઈ (H - ફૂટ)</label>
+                        <input type="number" id="wallHt" value="10" min="1" step="0.5">
+                    </div>
+                    <div>
+                        <label>દિવાલનો પ્રકાર</label>
+                        <select id="wallType">
+                            <option value="9">9" બહારની દિવાલ (1:6)</option>
+                            <option value="4.5">4.5" પાર્ટીશન દિવાલ (1:4)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🏢 ૨. સ્લેબ અને સ્ટ્રક્ચર (Slab & Frame)</h2>
+                <div class="form-group">
+                    <div>
+                        <label>સ્લેબ લંબાઈ (Length - ફૂટ)</label>
+                        <input type="number" id="slabLen" value="30" min="1" step="0.5">
+                    </div>
+                    <div>
+                        <label>સ્લેબ પહોળાઈ (Width - ફૂટ)</label>
+                        <input type="number" id="slabWid" value="15" min="1" step="0.5">
+                    </div>
+                </div>
+                <div class="form-group three-col">
+                    <div>
+                        <label>સ્લેબ જાડાઈ (ઇંચ)</label>
+                        <select id="slabThick">
+                            <option value="4.5">4.5 ઇંચ (115mm)</option>
+                            <option value="5" selected>5.0 ઇંચ (125mm)</option>
+                            <option value="6">6.0 ઇંચ (150mm)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>કોલમ અંતર (અંદાજે ફૂટ)</label>
+                        <input type="number" id="colSpan" value="12" min="8" max="18">
+                    </div>
+                    <div>
+                        <label>કોંક્રિટ ગ્રેડ</label>
+                        <select id="concreteGrade">
+                            <option value="M20">M20 (1:1.5:3)</option>
+                            <option value="M25">M25 (1:1:2)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>💰 ૩. અંદાજિત લેબર અને મટિરિયલ દર (Rates)</h2>
+                <div class="form-group">
+                    <div>
+                        <label>ઈંટનો ભાવ (₹ / નંગ)</label>
+                        <input type="number" id="rateBrick" value="8.5">
+                    </div>
+                    <div>
+                        <label>સિમેન્ટ બેગ (₹ / Bag)</label>
+                        <input type="number" id="rateCement" value="380">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>સ્ટીલ (₹ / Kg)</label>
+                        <input type="number" id="rateSteel" value="65">
+                    </div>
+                    <div>
+                        <label>ચણતર લેબર (₹ / Sq.Ft.)</label>
+                        <input type="number" id="rateMasonLabor" value="25">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>સ્લેબ સેન્ટરિંગ+કાસ્ટિંગ (₹ / Sq.Ft.)</label>
+                        <input type="number" id="rateSlabLabor" value="45">
+                    </div>
+                </div>
+
+                <button class="btn-calc" onclick="calculateAll()">📐 ગણતરી કરો અને ડ્રોઈંગ જુઓ</button>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="right-panel">
+            <div class="card">
+                <h2>
+                    🖼️ સ્ટ્રક્ચરલ ફ્રેમિંગ પ્લાન (2D Top View)
+                    <button class="btn-print" onclick="window.print()">🖨️ પ્રિન્ટ / PDF</button>
+                </h2>
+                <div class="drawing-container">
+                    <canvas id="planCanvas" width="550" height="350"></canvas>
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin-top: 6px; text-align: center;">
+                    લાલ ચોરસ: <b>કોલમ (Columns)</b> | વાદળી લાઈન: <b>બીમ (Beams)</b> | ગ્રીડ સાઈઝ સ્કેલ મુજબ છે.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>📋 મટિરિયલ અને સ્ટ્રક્ચરલ સમરી</h2>
+                <div id="outputSummary">
+                    <p style="color: #64748b;">ગણતરી કરવા માટે ડાબી બાજુ બટન પર ક્લિક કરો.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateAll() {
+        // --- 1. Inputs ---
+        const wallLen = parseFloat(document.getElementById('wallLen').value) || 0;
+        const wallHt = parseFloat(document.getElementById('wallHt').value) || 0;
+        const wallType = document.getElementById('wallType').value;
+
+        const slabLen = parseFloat(document.getElementById('slabLen').value) || 0;
+        const slabWid = parseFloat(document.getElementById('slabWid').value) || 0;
+        const slabThickInch = parseFloat(document.getElementById('slabThick').value) || 5;
+        const colSpan = parseFloat(document.getElementById('colSpan').value) || 12;
+
+        const rBrick = parseFloat(document.getElementById('rateBrick').value) || 0;
+        const rCement = parseFloat(document.getElementById('rateCement').value) || 0;
+        const rSteel = parseFloat(document.getElementById('rateSteel').value) || 0;
+        const rMasonLabor = parseFloat(document.getElementById('rateMasonLabor').value) || 0;
+        const rSlabLabor = parseFloat(document.getElementById('rateSlabLabor').value) || 0;
+
+        // --- 2. Brickwork Calculation ---
+        const wallAreaSqFt = wallLen * wallHt;
+        let brickCount = 0;
+        let wallCementBags = 0;
+        let wallSandCuFt = 0;
+
+        if (wallType === '9') {
+            const wallCuFt = wallAreaSqFt * 0.75; // 9" = 0.75 ft
+            brickCount = Math.ceil(wallCuFt * 13.5); // સ્ટાન્ડર્ડ 13.5 ઈંટો પ્રતિ Cu.Ft
+            // 1:6 મોર્ટાર
+            wallCementBags = Math.round((wallCuFt * 0.25 * 1.33 / (7 * 1.226)) * 10) / 10;
+            wallSandCuFt = Math.round(wallCementBags * 1.226 * 6);
+        } else {
+            // 4.5" પાર્ટીશન વોલ
+            brickCount = Math.ceil(wallAreaSqFt * 4.6); // આશરે 4.6 ઈંટો પ્રતિ Sq.Ft
+            // 1:4 મોર્ટાર
+            const wallCuFt = wallAreaSqFt * 0.375;
+            wallCementBags = Math.round((wallCuFt * 0.25 * 1.33 / (5 * 1.226)) * 10) / 10;
+            wallSandCuFt = Math.round(wallCementBags * 1.226 * 4);
+        }
+
+        // --- 3. Slab, Beam & Column Calculation ---
+        const slabAreaSqFt = slabLen * slabWid;
+        const slabThickFt = slabThickInch / 12;
+        const slabConcreteCuFt = slabAreaSqFt * slabThickFt;
+        const slabConcreteCuM = slabConcreteCuFt * 0.0283168;
+
+        // Column Count Logic (Grid layout based on Span)
+        const colsX = Math.ceil(slabLen / colSpan) + 1;
+        const colsY = Math.ceil(slabWid / colSpan) + 1;
+        const totalColumns = colsX * colsY;
+
+        // Beams Count & Running Feet
+        const totalBeamsX = colsY * (colsX - 1);
+        const totalBeamsY = colsX * (colsY - 1);
+        const totalBeamRft = (colsY * slabLen) + (colsX * slabWid);
+
+        // Concrete Estimation (M20: 1:1.5:3 => 8 bags per Cu.M)
+        const slabCementBags = Math.ceil(slabConcreteCuM * 8.2);
+        const slabSandCuFt = Math.round(slabCementBags * 1.5 * 1.226);
+        const slabMetalCuFt = Math.round(slabCementBags * 3.0 * 1.226);
+
+        // Steel Calculation
+        // Slab Steel: ~80 kg/cu.m
+        const slabSteelKg = Math.round(slabConcreteCuM * 80);
+        // Beams Steel: ~2.5 kg per R.Ft (Bottom 12mm, Top 10mm, Stirrups 8mm)
+        const beamSteelKg = Math.round(totalBeamRft * 2.3);
+        // Column Steel: ~10 ft height, 4 bars of 12mm + 8mm rings => ~22 kg per column
+        const columnSteelKg = Math.round(totalColumns * 22);
+        const totalSteelKg = slabSteelKg + beamSteelKg + columnSteelKg;
+
+        // --- 4. Costing Calculation ---
+        const totalBrickCost = brickCount * rBrick;
+        const totalCementCost = (wallCementBags + slabCementBags) * rCement;
+        const totalSteelCost = totalSteelKg * rSteel;
+        const totalWallLabor = wallAreaSqFt * rMasonLabor;
+        const totalSlabLabor = slabAreaSqFt * rSlabLabor;
+        const grandTotal = totalBrickCost + totalCementCost + totalSteelCost + totalWallLabor + totalSlabLabor;
+
+        // --- 5. Render Output HTML ---
+        let html = `
+            <table class="table-res">
+                <thead>
+                    <tr><th>આઇટમ / વર્ણન</th><th>વિગત</th><th>જથ્થો</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>દિવાલ ચણતર (${wallType}")</b></td>
+                        <td>${wallAreaSqFt} Sq.Ft (${wallLen}' x ${wallHt}')</td>
+                        <td><span class="highlight-val">${brickCount}</span> ઈંટો</td>
+                    </tr>
+                    <tr>
+                        <td><b>ચણતર મસાલો</b></td>
+                        <td>સિમેન્ટ અને રેતી</td>
+                        <td><b>${wallCementBags}</b> Bags | <b>${wallSandCuFt}</b> Cu.Ft રેતી</td>
+                    </tr>
+                    <tr>
+                        <td><b>સ્લેબ કોંક્રિટ (${slabThickInch}")</b></td>
+                        <td>${slabAreaSqFt} Sq.Ft (${slabConcreteCuFt.toFixed(1)} Cu.Ft)</td>
+                        <td><b>${slabCementBags}</b> Bags | <b>${slabSandCuFt}</b> રેતી | <b>${slabMetalCuFt}</b> કપચી</td>
+                    </tr>
+                    <tr>
+                        <td><b>કોલમ (Columns)</b></td>
+                        <td>સાઇઝ 9" x 12" (4 સળિયા 12mm + 8mm રીંગ)</td>
+                        <td><span class="highlight-val">${totalColumns}</span> નંગ કોલમ</td>
+                    </tr>
+                    <tr>
+                        <td><b>બીમ (Beams)</b></td>
+                        <td>સાઇઝ 9" x 12" (સ્પાન અનુસાર)</td>
+                        <td><span class="highlight-val">${totalBeamRft.toFixed(0)}</span> રનિંગ ફૂટ</td>
+                    </tr>
+                    <tr>
+                        <td><b>સ્ટીલ વિગત (Rebar Schedule)</b></td>
+                        <td>
+                            • સ્લેબ: 10mm & 8mm @ 6" c/c (${slabSteelKg} Kg)<br>
+                            • બીમ: 12mm & 10mm + 8mm રીંગ (${beamSteelKg} Kg)<br>
+                            • કોલમ: 12mm + 8mm રીંગ (${columnSteelKg} Kg)
+                        </td>
+                        <td><span class="highlight-val">${totalSteelKg} Kg</span> (~${(totalSteelKg/1000).toFixed(2)} ટન)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="cost-box">
+                <div class="cost-row"><span>ઈંટોનો ખર્ચ:</span> <span>₹${totalBrickCost.toLocaleString('en-IN')}</span></div>
+                <div class="cost-row"><span>સિમેન્ટ ખર્ચ (${(wallCementBags + slabCementBags).toFixed(1)} બેગ):</span> <span>₹${totalCementCost.toLocaleString('en-IN')}</span></div>
+                <div class="cost-row"><span>સ્ટીલ ખર્ચ (${totalSteelKg} Kg):</span> <span>₹${totalSteelCost.toLocaleString('en-IN')}</span></div>
+                <div class="cost-row"><span>ચણતર લેબર ખર્ચ:</span> <span>₹${totalWallLabor.toLocaleString('en-IN')}</span></div>
+                <div class="cost-row"><span>સ્લેબ સેન્ટરિંગ + કાસ્ટિંગ લેબર:</span> <span>₹${totalSlabLabor.toLocaleString('en-IN')}</span></div>
+                <div class="cost-row total"><span>કુલ અંદાજિત ખર્ચ:</span> <span>₹${grandTotal.toLocaleString('en-IN')}</span></div>
+            </div>
+        `;
+
+        document.getElementById('outputSummary').innerHTML = html;
+
+        // --- 6. Draw 2D Structural Canvas ---
+        drawCanvasPlan(slabLen, slabWid, colsX, colsY);
+    }
+
+    function drawCanvasPlan(L, W, colsX, colsY) {
+        const canvas = document.getElementById('planCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const pad = 50;
+        const drawW = canvas.width - (pad * 2);
+        const drawH = canvas.height - (pad * 2);
+
+        // Aspect ratio scaling
+        const scaleX = drawW / L;
+        const scaleY = drawH / W;
+        const scale = Math.min(scaleX, scaleY);
+
+        const actualDrawW = L * scale;
+        const actualDrawH = W * scale;
+        const startX = (canvas.width - actualDrawW) / 2;
+        const startY = (canvas.height - actualDrawH) / 2;
+
+        // Draw Slab Outline
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(startX, startY, actualDrawW, actualDrawH);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(startX, startY, actualDrawW, actualDrawH);
+
+        // Draw Grid Beams
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2;
+
+        const stepX = actualDrawW / (colsX - 1);
+        const stepY = actualDrawH / (colsY - 1);
+
+        // Horizontal Beams
+        for (let j = 0; j < colsY; j++) {
+            const y = startY + (j * stepY);
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(startX + actualDrawW, y);
+            ctx.stroke();
+        }
+
+        // Vertical Beams
+        for (let i = 0; i < colsX; i++) {
+            const x = startX + (i * stepX);
+            ctx.beginPath();
+            ctx.moveTo(x, startY);
+            ctx.lineTo(x, startY + actualDrawH);
+            ctx.stroke();
+        }
+
+        // Draw Columns
+        const colSize = 12;
+        ctx.fillStyle = '#dc2626'; // Red for columns
+        for (let i = 0; i < colsX; i++) {
+            for (let j = 0; j < colsY; j++) {
+                const cx = startX + (i * stepX) - (colSize / 2);
+                const cy = startY + (j * stepY) - (colSize / 2);
+                ctx.fillRect(cx, cy, colSize, colSize);
+                
+                // Column Labels
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '8px Arial';
+                ctx.fillText(`C`, cx + 2, cy + 9);
+                ctx.fillStyle = '#dc2626';
+            }
+        }
+
+        // Dimension text
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '13px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`લંબાઈ: ${L} ફૂટ`, canvas.width / 2, startY - 15);
+
+        ctx.save();
+        ctx.translate(startX - 15, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(`પહોળાઈ: ${W} ફૂટ`, 0, 0);
+        ctx.restore();
+    }
+
+    // Auto-run on load
+    window.onload = calculateAll;
+</script>
+
+</body>
+</html>
